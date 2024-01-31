@@ -1,20 +1,35 @@
-// FirstProcess.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+﻿#include <iostream>
+#include <windows.h>
 
-#include <iostream>
+void ErrorFunction() {
+	// 模拟一个发生错误的情况
+	SetLastError(ERROR_FILE_NOT_FOUND);
 
-int main()
-{
-    std::cout << "Hello World!\n";
+	// 获取错误代码
+	DWORD errorCode = GetLastError();
+
+	// 输出错误代码
+	std::cout << "Last Error Code: " << errorCode << std::endl;
+
+	// 使用 FormatMessage 函数获取错误消息
+	LPVOID errorMessage;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		errorCode,
+		0, // Default language
+		(CHAR*)&errorMessage,
+		0,
+		NULL
+	);
+	// 输出错误消息
+	std::cout << "Error Message: " << static_cast<CHAR*>(errorMessage) << std::endl;
+
+	// 释放消息缓冲区
+	LocalFree(errorMessage);
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+int main() {
+	ErrorFunction();
+	return 0;
+}
