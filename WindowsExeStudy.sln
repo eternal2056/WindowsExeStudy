@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessCommon", "ProcessCom
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellCodeCommon", "ShellCodeCommon\ShellCodeCommon.vcxproj", "{1FEEABD9-A9B7-49A4-9BC5-68BB6EC8F72E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellCodeExe", "ShellCodeExe\ShellCodeExe.vcxproj", "{14E92276-8CC8-428E-B108-905D847FAA71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{1FEEABD9-A9B7-49A4-9BC5-68BB6EC8F72E}.Release|x64.Build.0 = Release|x64
 		{1FEEABD9-A9B7-49A4-9BC5-68BB6EC8F72E}.Release|x86.ActiveCfg = Release|Win32
 		{1FEEABD9-A9B7-49A4-9BC5-68BB6EC8F72E}.Release|x86.Build.0 = Release|Win32
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Debug|x64.ActiveCfg = Debug|x64
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Debug|x64.Build.0 = Debug|x64
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Debug|x86.ActiveCfg = Debug|Win32
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Debug|x86.Build.0 = Debug|Win32
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Release|x64.ActiveCfg = Release|x64
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Release|x64.Build.0 = Release|x64
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Release|x86.ActiveCfg = Release|Win32
+		{14E92276-8CC8-428E-B108-905D847FAA71}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

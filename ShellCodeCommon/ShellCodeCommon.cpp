@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <windows.h>
 
-#pragma code_seg("shell")
+//#pragma code_seg("shell") // 这个好像不行, 总是会崩, 直接从 0x400 取
 //#pragma commnet(linker, "/entry:myMain") // 这样也行, 行个屁
 // 1. 修改入口点		Propoties -> Linker -> Advanced -> Entry Point -> myMain
 // 2. 指定代码段		#pragma code_seg("shell")
@@ -16,14 +16,14 @@ void myMain()
 {
 	// 1. 获取 Kernel32.dll 基地址 或者 ntdll.dll | Kernel32.dll | user32.dll, 有顺序的加载
 
-	DWORD dwKernel32 = 0;
+	DWORD64 dwKernel32 = 0;
 	// 通过 TEB 获取 PEB
 	_TEB* pTeb = NtCurrentTeb();
-	PDWORD pPeb = (PDWORD) * (PDWORD)((DWORD)pTeb + 0x60); // _PEB
+	PDWORD64 pPeb = (PDWORD64) * (PDWORD64)((DWORD64)pTeb + 0x60); // _PEB
 	// 通过 PEB 获取 模块链表 Ldr
-	PDWORD pLdr = (PDWORD) * (PDWORD)((DWORD)pPeb + 0x18); // _PEB_LDR_DATA
+	PDWORD64 pLdr = (PDWORD64) * (PDWORD64)((DWORD64)pPeb + 0x18); // _PEB_LDR_DATA
 	// 通过 Ldr 获取 已加载的模块链表 InLoadOrderModuleList
-	PDWORD InLoadOrderModuleList = (PDWORD)((DWORD)pLdr + 0x10); // _LIST_ENTRY 里面存的是 _LDR_DATA_TABLE_ENTRY
+	PDWORD64 InLoadOrderModuleList = (PDWORD64)((DWORD64)pLdr + 0x10); // _LIST_ENTRY 里面存的是 _LDR_DATA_TABLE_ENTRY
 	/*
 	nt!_LDR_DATA_TABLE_ENTRY
    +0x000 InLoadOrderLinks : _LIST_ENTRY				// 模块链表
@@ -87,29 +87,29 @@ void myMain()
    +0x11c SigningLevel     : UChar
 
 	*/
-	PDWORD pModExe = (PDWORD)*InLoadOrderModuleList;
-	PDWORD pModNtDll = (PDWORD)*pModExe;
-	PDWORD pModKernel32 = (PDWORD)*pModNtDll;
-	dwKernel32 = *(pModKernel32 + 0x30); // DllBase
+	PDWORD64 pModExe = (PDWORD64)*InLoadOrderModuleList;
+	PDWORD64 pModNtDll = (PDWORD64)*pModExe;
+	PDWORD64 pModKernel32 = (PDWORD64)*pModNtDll;
+	dwKernel32 = *(pModKernel32 + 6); // DllBase
 
-	DWORD dwBase = dwKernel32;
+	DWORD64 dwBase = dwKernel32;
 	PIMAGE_DOS_HEADER pDos = (PIMAGE_DOS_HEADER)dwKernel32;
 	PIMAGE_NT_HEADERS pNt = (PIMAGE_NT_HEADERS)(pDos->e_lfanew + dwKernel32);
 	PIMAGE_DATA_DIRECTORY pExportDir = pNt->OptionalHeader.DataDirectory;
 	// 导出表
 	pExportDir = &pExportDir[IMAGE_DIRECTORY_ENTRY_EXPORT];
-	DWORD dwOffset = pExportDir->VirtualAddress;
+	DWORD64 dwOffset = pExportDir->VirtualAddress;
 	PIMAGE_EXPORT_DIRECTORY pExport = (PIMAGE_EXPORT_DIRECTORY)(dwOffset + dwBase);
 	// 导出表数据弄出来
-	DWORD dwFuncCount = pExport->NumberOfFunctions; // 导出函数的个数
-	DWORD dwFuncNameCount = pExport->NumberOfNames;	// 导出函数名字个数
+	DWORD64 dwFuncCount = pExport->NumberOfFunctions; // 导出函数的个数
+	DWORD64 dwFuncNameCount = pExport->NumberOfNames;	// 导出函数名字个数
 	// 两个表的地址
 	PDWORD pEnt = (PDWORD)(dwBase + pExport->AddressOfNames);
 	PDWORD pEat = (PDWORD)(dwBase + pExport->AddressOfFunctions);
 	// 序号表
 	PDWORD pEit = (PDWORD)(dwBase + pExport->AddressOfNameOrdinals);
 
-	DWORD dwFuncAddress; // GetProcAddress
+	DWORD64 dwFuncAddress; // GetProcAddress
 	for (size_t i = 0; i < dwFuncCount; i++) {
 		if (!pEat[i]) {
 			continue;
@@ -142,7 +142,7 @@ void myMain()
 						nFlag++;
 					}
 					if (nFlag == 14) {
-						dwFuncAddress = pEat[pEit[index]] + dwBase;
+						dwFuncAddress = pEat[index] + dwBase;
 					}
 				}
 			}
@@ -162,6 +162,7 @@ void myMain()
 	'a',
 	'r',
 	'y',
+	'A',
 	'\0',
 	};
 	char szGetProcAddress[] = {
